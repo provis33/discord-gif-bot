@@ -1,0 +1,9 @@
+.env
+bin/
+models/
+data/
+library/
+node_modules/
+*.traineddata
+*.log
+.DS_Store

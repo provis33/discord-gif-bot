@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>архив</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&family=IBM+Plex+Sans:wght@400;500&family=Newsreader:ital,opsz,wght@1,6..72,400;1,6..72,500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0b0b;
+        --surface: #141414;
+        --line: #2a2a2a;
+        --text: #e8e4dc;
+        --muted: #7a7670;
+        --accent: #c4a574;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html,
+      body {
+        min-height: 100%;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+      }
+
+      body {
+        overflow-x: hidden;
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 12px;
+        border-bottom: 1px solid var(--line);
+        background: color-mix(in srgb, var(--bg) 90%, transparent);
+        backdrop-filter: blur(12px);
+      }
+
+      .wordmark {
+        font-family: Newsreader, Georgia, serif;
+        font-style: italic;
+        font-size: 22px;
+        font-weight: 400;
+        letter-spacing: -0.02em;
+      }
+
+      .meta {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .share {
+        background: none;
+        border: 0;
+        padding: 0;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+        cursor: pointer;
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .tabs {
+        display: flex;
+        gap: 6px;
+      }
+
+      .tabs button {
+        appearance: none;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--muted);
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+
+      .tabs button:hover {
+        color: var(--text);
+        border-color: var(--accent);
+      }
+
+      .tabs button.on {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: #1a1712;
+      }
+
+      .count {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--muted);
+        white-space: nowrap;
+      }
+
+      .search {
+        width: 120px;
+        background: transparent;
+        border: 0;
+        border-bottom: 1px solid transparent;
+        color: var(--text);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-size: 13px;
+        outline: none;
+        padding: 4px 0;
+      }
+
+      .search::placeholder {
+        color: var(--muted);
+      }
+
+      .search:focus {
+        border-bottom-color: var(--accent);
+      }
+
+      .grid {
+        columns: 2;
+        column-gap: 6px;
+        padding: 8px;
+      }
+
+      @media (min-width: 800px) {
+        .grid {
+          columns: 3;
+        }
+      }
+
+      @media (min-width: 1280px) {
+        .grid {
+          columns: 4;
+        }
+      }
+
+      @media (min-width: 1600px) {
+        .grid {
+          columns: 5;
+        }
+      }
+
+      .tile {
+        display: block;
+        width: 100%;
+        margin: 0 0 6px;
+        break-inside: avoid;
+        background: var(--surface);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .shot {
+        display: block;
+        width: 100%;
+        border: 0;
+        padding: 0;
+        background: none;
+        cursor: zoom-in;
+      }
+
+      .tile img {
+        display: block;
+        width: 100%;
+        transform: scale(1);
+        filter: brightness(0.88);
+        transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), filter 0.4s ease;
+      }
+
+      .tile:hover img,
+      .tile:focus-within img {
+        transform: scale(1.04);
+        filter: brightness(1);
+      }
+
+      .actions {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        opacity: 1;
+      }
+
+      .act {
+        background: rgba(11, 11, 11, 0.78);
+        border: 1px solid var(--line);
+        color: var(--text);
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 6px 8px;
+        cursor: pointer;
+      }
+
+      .act:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      .star {
+        appearance: none;
+        width: 32px;
+        height: 32px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        color: var(--text);
+        transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+      }
+
+      .star svg {
+        width: 15px;
+        height: 15px;
+        fill: transparent;
+        stroke: currentColor;
+        stroke-width: 1.5;
+        stroke-linejoin: round;
+      }
+
+      .star:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .star.on {
+        color: var(--accent);
+        border-color: var(--accent);
+        background: #1a1712;
+      }
+
+      .star.on svg {
+        fill: var(--accent);
+        stroke: var(--accent);
+      }
+
+      .veil {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 28px 8px 8px;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.72));
+        color: var(--text);
+        font-size: 12px;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        text-align: left;
+        pointer-events: none;
+      }
+
+      .tile:hover .veil,
+      .tile:focus-within .veil {
+        opacity: 1;
+      }
+
+      .empty {
+        min-height: calc(100vh - 48px);
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 48px 16px;
+      }
+
+      .empty p {
+        font-family: Newsreader, Georgia, serif;
+        font-style: italic;
+        font-size: 28px;
+      }
+
+      .empty span {
+        display: block;
+        margin-top: 10px;
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .lb {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        display: grid;
+        place-items: center;
+        background: rgba(0, 0, 0, 0.9);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        cursor: zoom-out;
+      }
+
+      .lb.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+
+      .lb figure {
+        max-width: 92vw;
+        max-height: 88vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 14px;
+        cursor: default;
+      }
+
+      .lb img {
+        max-width: 92vw;
+        max-height: calc(88vh - 72px);
+        object-fit: contain;
+        transform: scale(0.97);
+        transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+
+      .lb.open img {
+        transform: scale(1);
+      }
+
+      .lb figcaption {
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .lb button {
+        background: none;
+        border: 0;
+        color: var(--accent);
+        font: inherit;
+        letter-spacing: inherit;
+        text-transform: inherit;
+        cursor: pointer;
+      }
+
+      .lb button:hover {
+        color: var(--text);
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        z-index: 80;
+        transform: translateX(-50%) translateY(8px);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--text);
+        font-family: "IBM Plex Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 10px 14px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%);
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wordmark">архив</div>
+      <button type="button" class="share hidden" id="share">ссылка для друзей</button>
+      <div class="meta">
+        <div class="tabs">
+          <button type="button" id="tab-all" class="on">все</button>
+          <button type="button" id="tab-fav">избранное</button>
+        </div>
+        <input class="search" id="search" type="search" placeholder="текст на меме" autocomplete="off" />
+        <div class="count" id="count">0 gif</div>
+      </div>
+    </header>
+
+    <main>
+      <div class="empty" id="empty">
+        <div>
+          <p>Пока пусто.</p>
+          <span>Кинь фото в канал gif</span>
+        </div>
+      </div>
+      <section class="grid hidden" id="grid"></section>
+    </main>
+
+    <div class="lb" id="lightbox" hidden>
+      <figure>
+        <img id="lb-img" alt="" />
+        <figcaption>
+          <button type="button" id="prev">←</button>
+          <span id="lb-cap"></span>
+          <button type="button" id="copy-lb">копировать</button>
+          <button type="button" id="star-lb">в избранное</button>
+          <button type="button" id="next">→</button>
+        </figcaption>
+      </figure>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const grid = document.getElementById("grid");
+      const empty = document.getElementById("empty");
+      const count = document.getElementById("count");
+      const search = document.getElementById("search");
+      const lightbox = document.getElementById("lightbox");
+      const lbImg = document.getElementById("lb-img");
+      const lbCap = document.getElementById("lb-cap");
+      const toastEl = document.getElementById("toast");
+      const tabAll = document.getElementById("tab-all");
+      const tabFav = document.getElementById("tab-fav");
+      const starLb = document.getElementById("star-lb");
+      const share = document.getElementById("share");
+      const isHost =
+        location.hostname === "127.0.0.1" || location.hostname === "localhost";
+
+      let items = [];
+      let visible = [];
+      let index = 0;
+      let query = "";
+      let onlyFav = false;
+      let toastTimer;
+
+      function niceName(name) {
+        return decodeURIComponent(name)
+          .replace(/\.gif$/i, "")
+          .replace(/^\d{4}-\d{2}-\d{2}T[\d-]+_/, "")
+          .replaceAll("_", " ");
+      }
+
+      function toast(text) {
+        toastEl.textContent = text;
+        toastEl.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toastEl.classList.remove("show"), 1600);
+      }
+
+      async function copyGif(item) {
+        if (isHost) {
+          const res = await fetch("/api/copy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: item.name }),
+          });
+          if (res.ok) {
+            toast("скопировано — вставляй в Discord");
+            return;
+          }
+        }
+
+        const blob = await fetch(item.url).then((r) => r.blob());
+        try {
+          await navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]);
+          toast("скопировано");
+          return;
+        } catch {
+          const png = await gifToPng(blob);
+          if (png) {
+            try {
+              await navigator.clipboard.write([new ClipboardItem({ "image/png": png })]);
+              toast("скопировано");
+              return;
+            } catch {
+              // скачаем файл
+            }
+          }
+        }
+
+        const link = document.createElement("a");
+        link.href = item.url;
+        link.download = item.name;
+        link.click();
+        toast("скачал GIF");
+      }
+
+      function gifToPng(blob) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          const href = URL.createObjectURL(blob);
+          img.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            canvas.getContext("2d").drawImage(img, 0, 0);
+            canvas.toBlob((out) => {
+              URL.revokeObjectURL(href);
+              resolve(out);
+            }, "image/png");
+          };
+          img.onerror = () => {
+            URL.revokeObjectURL(href);
+            resolve(null);
+          };
+          img.src = href;
+        });
+      }
+
+      async function toggleFav(item) {
+        const on = !item.favorite;
+        item.favorite = on;
+        render();
+        if (!lightbox.hidden) updateLightbox();
+        await fetch("/api/favorite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: item.name, on }),
+        });
+      }
+
+      function render() {
+        visible = items.filter((item) => {
+          if (onlyFav && !item.favorite) return false;
+          return true;
+        });
+        count.textContent = `${visible.length} gif`;
+
+        if (!visible.length) {
+          grid.classList.add("hidden");
+          empty.classList.remove("hidden");
+          if (!items.length) {
+            empty.querySelector("p").textContent = "Пока пусто.";
+            empty.querySelector("span").textContent = "Кинь фото в канал gif";
+          } else if (onlyFav) {
+            empty.querySelector("p").textContent = "Избранного нет.";
+            empty.querySelector("span").textContent = "нажми звезду на гифке";
+          } else {
+            empty.querySelector("p").textContent = "Ничего не нашёл.";
+            empty.querySelector("span").textContent = "другой запрос";
+          }
+          return;
+        }
+
+        empty.classList.add("hidden");
+        grid.classList.remove("hidden");
+        grid.replaceChildren(
+          ...visible.map((item, i) => {
+            const tile = document.createElement("article");
+            tile.className = "tile";
+            tile.innerHTML = `
+              <button class="shot" type="button">
+                <img src="${item.url}" alt="" loading="lazy">
+              </button>
+              <div class="actions">
+                <button class="act copy" type="button">копировать</button>
+                <button class="act star ${item.favorite ? "on" : ""}" type="button" aria-label="избранное">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.47 6.28 6.73.55-5.16 4.4 1.6 6.57L12 16.9 6.36 20.4l1.6-6.57-5.16-4.4 6.73-.55L12 2.6z"/></svg>
+                </button>
+              </div>
+              <span class="veil">${niceName(item.name)}</span>
+            `;
+            tile.querySelector(".shot").addEventListener("click", () => openAt(i));
+            tile.querySelector(".copy").addEventListener("click", (e) => {
+              e.stopPropagation();
+              copyGif(item);
+            });
+            tile.querySelector(".star").addEventListener("click", (e) => {
+              e.stopPropagation();
+              toggleFav(item);
+            });
+            return tile;
+          })
+        );
+      }
+
+      function updateLightbox() {
+        const item = visible[index];
+        if (!item) return;
+        lbImg.src = item.url;
+        lbCap.textContent = `${index + 1} / ${visible.length}  ·  ${niceName(item.name)}`;
+        starLb.textContent = item.favorite ? "★ в избранном" : "в избранное";
+      }
+
+      function openAt(i) {
+        index = i;
+        if (!visible[index]) return;
+        updateLightbox();
+        lightbox.hidden = false;
+        requestAnimationFrame(() => lightbox.classList.add("open"));
+      }
+
+      function closeLb() {
+        lightbox.classList.remove("open");
+        setTimeout(() => {
+          if (!lightbox.classList.contains("open")) lightbox.hidden = true;
+        }, 200);
+      }
+
+      async function load() {
+        const params = new URLSearchParams();
+        if (query) params.set("q", query);
+        const res = await fetch(`/api/gifs?${params}`);
+        items = await res.json();
+        render();
+        if (!lightbox.hidden) updateLightbox();
+        await loadTunnel();
+      }
+
+      async function loadTunnel() {
+        const res = await fetch("/api/tunnel");
+        const data = await res.json();
+        if (!data.url) return;
+        share.dataset.url = data.url;
+        share.classList.remove("hidden");
+      }
+
+      share.addEventListener("click", async () => {
+        if (!share.dataset.url) return;
+        await navigator.clipboard.writeText(share.dataset.url);
+        toast("ссылка скопирована — кидай друзьям");
+      });
+
+      function setTab(fav) {
+        onlyFav = fav;
+        tabAll.classList.toggle("on", !fav);
+        tabFav.classList.toggle("on", fav);
+        render();
+      }
+
+      tabAll.addEventListener("click", () => setTab(false));
+      tabFav.addEventListener("click", () => setTab(true));
+      let searchTimer;
+      search.addEventListener("input", () => {
+        query = search.value.trim();
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+          load();
+        }, 280);
+      });
+
+      document.getElementById("prev").addEventListener("click", (e) => {
+        e.stopPropagation();
+        openAt((index - 1 + visible.length) % visible.length);
+      });
+      document.getElementById("next").addEventListener("click", (e) => {
+        e.stopPropagation();
+        openAt((index + 1) % visible.length);
+      });
+      document.getElementById("copy-lb").addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (visible[index]) copyGif(visible[index]);
+      });
+      starLb.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (visible[index]) toggleFav(visible[index]);
+      });
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) closeLb();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (lightbox.hidden) return;
+        if (e.key === "Escape") closeLb();
+        if (e.key === "ArrowLeft") openAt((index - 1 + visible.length) % visible.length);
+        if (e.key === "ArrowRight") openAt((index + 1) % visible.length);
+        if (e.key.toLowerCase() === "c") copyGif(visible[index]);
+        if (e.key === "f" || e.key === "F") toggleFav(visible[index]);
+      });
+
+      load();
+      try {
+        const stream = new EventSource("/api/stream");
+        stream.addEventListener("message", load);
+      } catch {
+        setInterval(load, 2500);
+      }
+    </script>
+  </body>
+</html>
